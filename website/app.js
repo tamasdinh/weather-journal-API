@@ -19,13 +19,13 @@ const getWeather = async (zip, country) => {
 }
 
 // POST call to send user data from forms to own API server
-const postUserData = async (temperature, date, userResponse) => {
+const postUserData = async (localURL, port, postPayLoad) => {
   fetch(localURL + ':' + port + '/post', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json'
     },
-    body: JSON.stringify({temperature, date, userResponse})
+    body: JSON.stringify(postPayLoad)
   })
 }
 
@@ -33,22 +33,29 @@ const postUserData = async (temperature, date, userResponse) => {
 const getCurrentData = async () => {
   return await fetch(localURL + ':' + port + '/get').then(response => response.json())
 }
+
+async function clickUpdate () {
+  const country = document.getElementById('country').value;
+  const zip = document.getElementById('zip').value;
+  
+  const userResponse = document.getElementById('feelings').value;
+  const temperature = await getWeather(zip, country);
+
+  const postPayLoad = {temperature, date: newDate, userResponse};
+  await postUserData(localURL, port, postPayLoad);
+  
+  await getCurrentData()
+  .then((response) => {
+    document.getElementById('date').innerHTML = response.date,
+    document.getElementById('temp').innerHTML = response.temperature,
+    document.getElementById('content').innerHTML = response.userResponse
+  });
+  
+}
  
 
 /* Execution */
 
 // Adding click EventListener to "Generate" button in HTML
 
-document.getElementById('generate').addEventListener('click', async () => {
-  const country = document.getElementById('country').value;
-  const zip = document.getElementById('zip').value;
-  const userResponse = document.getElementById('feelings').value;
-  const temperature = await getWeather(zip, country);
-  await postUserData(temperature, newDate, userResponse);
-  await getCurrentData()
-  .then((response) => {
-    document.getElementById('date').innerText = response.date,
-    document.getElementById('temp').innerText = response.temperature,
-    document.getElementById('content').innerText = response.userResponse
-  });
-})
+document.getElementById('generate').addEventListener('click', clickUpdate)

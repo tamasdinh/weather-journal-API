@@ -28,6 +28,7 @@ app.get('/get', (req, res) => {
 
 app.post('/post', bodyParser.json(), (req, res) => {
   const { temperature, date, userResponse } = req.body;
+  console.log('Data payload received:', req.body);
   
   if (temperature && date && userResponse) {
     projectData = {

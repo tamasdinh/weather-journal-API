@@ -1,5 +1,0 @@
-{
-  "API": "api.openweathermap.org/data/2.5/weather",
-  "key": "b6c2e555f36966be6615e36144ea6610",
-  "params": "?zip={zipCode},{countryCode}"
-}

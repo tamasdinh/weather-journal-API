@@ -1,5 +1,54 @@
 /* Global Variables */
+const baseURL = 'http://api.openweathermap.org/data/2.5/weather';
+const key = '&APPID=';
+const keyValue = 'b6c2e555f36966be6615e36144ea6610';
+const localURL = 'http://localhost';
+const port = 5001;
 
-// Create a new date instance dynamically with JS
 let d = new Date();
-let newDate = d.getMonth()+'.'+ d.getDate()+'.'+ d.getFullYear();
+let month = d.getMonth() + 1;
+let newDate = d.getDate() + '/' + month + '/' + d.getFullYear();
+
+
+/* Functions */
+
+// GET call to obtain weather data with user-provided zip code and country code
+const getWeather = async (zip, country) => {
+  const url = baseURL + '?zip=' + zip + ',' + country + key + keyValue;
+  return await fetch(url).then(response => response.json()).then(response => response.main.temp);
+}
+
+// POST call to send user data from forms to own API server
+const postUserData = async (temperature, date, userResponse) => {
+  fetch(localURL + ':' + port + '/post', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({temperature, date, userResponse})
+  })
+}
+
+// GET call to obtain current project data object
+const getCurrentData = async () => {
+  return await fetch(localURL + ':' + port + '/get').then(response => response.json())
+}
+ 
+
+/* Execution */
+
+// Adding click EventListener to "Generate" button in HTML
+
+document.getElementById('generate').addEventListener('click', async () => {
+  const country = document.getElementById('country').value;
+  const zip = document.getElementById('zip').value;
+  const userResponse = document.getElementById('feelings').value;
+  const temperature = await getWeather(zip, country);
+  await postUserData(temperature, newDate, userResponse);
+  await getCurrentData()
+  .then((response) => {
+    document.getElementById('date').innerText = response.date,
+    document.getElementById('temp').innerText = response.temperature,
+    document.getElementById('content').innerText = response.userResponse
+  });
+})
